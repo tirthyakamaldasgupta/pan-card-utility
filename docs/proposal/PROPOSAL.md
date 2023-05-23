@@ -1,20 +1,40 @@
-# Extracting information from images of PAN card using an OCR tool
+# PAN card verification
 
-## Workflow
+# Main flow
+
+## PAN card verification
+
+### Workflow
 
 ---
 
 <br/>
 
-![Extracting information from images of PAN card using an OCR tool](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20from%20images%20of%20PAN%20card%20using%20an%20OCR%20tool/workflow.png?token=GHSAT0AAAAAACC6GPVS66WUD2A6MQ45VH72ZDMFRSQ)
+![PAN card verification](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20from%20images%20of%20PAN%20card%20using%20an%20OCR%20tool/workflow.png?token=GHSAT0AAAAAACC6GPVS66WUD2A6MQ45VH72ZDMFRSQ)
 
-## Limitations
+---
+
+# Sub-flows
+
+## Extracting information from images of PAN card using an OCR tool
+
+---
+
+### Workflow
+
+---
+
+<br/>
+
+![Extracting information from images of PAN card using an OCR tool](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20from%20images%20of%20PAN%20card%20using%20an%20OCR%20tool/workflow.png?token=GHSAT0AAAAAACC6GPVSJNXTZGJN47S7H2T4ZDMICDQ)
+
+### Limitations
 
 ---
 
 The tools mentioned in this [article](https://nanonets.com/blog/ocr-software-best-ocr-software/#what-is-ocr-what-does-ocr-software-do) undoubtedly have the capability to recognize text in documents and images. However, in many cases, the accuracy of the results may be compromised when using a generic OCR tool instead of a specialized tool developed explicitly for identity verification purposes.
 
-## Solution
+### Solution
 
 ---
 
@@ -22,17 +42,21 @@ If you opt to utilize the public APIs offered by a specialized provider in ident
 
 IDFY offers an additional public API called **India - Pan card OCR** in collaboration with [**RapidAPI**](https://rapidapi.com/hub). This API serves the same purpose but provides only basic details in the response. It is important to note that a significant portion of an individual's information remains undisclosed when utilizing this API. Furthermore, there is a monthly request limit for free subscribers. However, using this API eliminates the need for the previously mentioned complex registration process. For conducting a Proof of Concept (POC), this API is recommended within the specified scope. For more information on this API, please visit the details provided [here](https://rapidapi.com/idfy-idfy-default/api/india-pan-card-ocr/).
 
-# Extracting information for existing PAN card holders
+---
 
-## Workflow
+## Extracting information for existing PAN card holders
+
+---
+
+### Workflow
 
 ---
 
 <br/>
 
-![Extracting information for existing PAN card holders](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20for%20existing%20PAN%20card%20holders/workflow.png?token=GHSAT0AAAAAACC6GPVTTU2O5GG3YWPFLWTGZDMFRCQ)
+![Extracting information for existing PAN card holders](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20for%20existing%20PAN%20card%20holders/workflow.png?token=GHSAT0AAAAAACC6GPVTJYV7WHCTJDINNPSOZDMICSQ)
 
-## Limitations
+### Limitations
 
 ---
 
@@ -40,7 +64,7 @@ Information extraction from an individual's PAN Card through website bots is not
 
 ---
 
-## Solution
+### Solution
 
 ---
 
