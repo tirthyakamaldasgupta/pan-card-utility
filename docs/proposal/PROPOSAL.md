@@ -6,7 +6,7 @@
 
 <br/>
 
-![Extracting information from images of PAN card using an OCR tool](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20from%20images%20of%20PAN%20card%20using%20an%20OCR%20tool/workflow.png?token=GHSAT0AAAAAACC6GPVTTQLKX6KTCGVRMC42ZDMEEYA)
+![Extracting information from images of PAN card using an OCR tool](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20from%20images%20of%20PAN%20card%20using%20an%20OCR%20tool/workflow.png?token=GHSAT0AAAAAACC6GPVS66WUD2A6MQ45VH72ZDMFRSQ)
 
 ## Limitations
 
@@ -30,7 +30,7 @@ IDFY offers an additional public API called **India - Pan card OCR** in collabor
 
 <br/>
 
-![Extracting information for existing PAN card holders](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20for%20existing%20PAN%20card%20holders/workflow.png?token=GHSAT0AAAAAACC6GPVTOV3S2DATOAEAKQEKZDMED7Q)
+![Extracting information for existing PAN card holders](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20for%20existing%20PAN%20card%20holders/workflow.png?token=GHSAT0AAAAAACC6GPVTTU2O5GG3YWPFLWTGZDMFRCQ)
 
 ## Limitations
 
