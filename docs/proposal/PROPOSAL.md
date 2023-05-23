@@ -4,13 +4,15 @@
 
 ## PAN card verification
 
+---
+
 ### Workflow
 
 ---
 
 <br/>
 
-![PAN card verification](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/sub-flows/Extracting%20information%20from%20images%20of%20PAN%20card%20using%20an%20OCR%20tool/workflow.png?token=GHSAT0AAAAAACC6GPVS66WUD2A6MQ45VH72ZDMFRSQ)
+![PAN card verification](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-automation/main/docs/proposal/diagrams/workflows/main-flow/workflow.png?token=GHSAT0AAAAAACC6GPVSYXPHWVDVFWYD7D6YZDMIE2A)
 
 ---
 
