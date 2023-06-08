@@ -1,6 +1,6 @@
 import glob
 import sys
-from typing import List
+from typing import Dict, List
 from dotenv import load_dotenv
 import os
 import logging
@@ -10,6 +10,32 @@ import base64
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
+
+
+def get_converted_img_data(new_imgs_list: List) -> Dict:
+    """
+    Converts a list of image files to base64-encoded strings.
+
+    Args:
+        new_imgs_list (List[str]): A list of image file paths.
+
+    Returns:
+        Dict[str, str]: A dictionary where keys are image file paths and values are the corresponding base64-encoded strings.
+
+    Raises:
+        None
+
+    """
+    new_imgs_list_len = len(new_imgs_list)
+
+    new_imgs_dict = {}
+
+    for index in range(new_imgs_list_len):
+        with open(new_imgs_list[index], "rb") as img_file:
+            new_imgs_dict[new_imgs_list[index]] = base64.b64encode(img_file.read())
+            new_imgs_dict[new_imgs_list[index]] = new_imgs_dict[new_imgs_list[index]].decode("utf-8")
+
+    return new_imgs_dict
 
 
 def get_dir_from_env(dir_env_var_key: str,) -> str:
@@ -85,13 +111,7 @@ def main():
     if not new_pan_card_imgs_list:
         sys.exit()
 
-    new_pan_card_imgs_list_len = len(new_pan_card_imgs_list)
-
-    new_pan_card_imgs_dict = {}
-
-    for index in range(new_pan_card_imgs_list_len):
-        with open(new_pan_card_imgs_list[index], "rb") as img_file:
-            new_pan_card_imgs_dict[new_pan_card_imgs_list[index]] = base64.b64encode(img_file.read()).decode("utf-8")
+    new_pan_card_imgs_dict = get_converted_img_data(new_pan_card_imgs_list)
 
     del new_pan_card_imgs_list
 
