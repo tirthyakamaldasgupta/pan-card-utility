@@ -237,6 +237,7 @@ def main():
             pass
 
         scheduler_api_resp_json["result"]["extraction_output"]["id"] = generate(alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_", size=12)
+        scheduler_api_resp_json["result"]["extraction_output"]["verified"] = False
 
         pan_card_details_table.put_item(Item=scheduler_api_resp_json["result"]["extraction_output"])
 
