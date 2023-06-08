@@ -80,16 +80,20 @@ def main():
     PAN_CARD_NEW_IMG_DIR = get_dir_from_env("PAN_CARD_NEW_IMG_DIR")
     PAN_CARD_ARCHIVED_IMG_DIR = get_dir_from_env("PAN_CARD_ARCHIVED_IMG_DIR")
 
-    new_pan_card_imgs = get_new_pan_card_images(PAN_CARD_NEW_IMG_DIR)
+    new_pan_card_imgs_list = get_new_pan_card_images(PAN_CARD_NEW_IMG_DIR)
 
-    if not new_pan_card_imgs:
+    if not new_pan_card_imgs_list:
         sys.exit()
 
-    new_pan_card_imgs_len = len(new_pan_card_imgs)
+    new_pan_card_imgs_list_len = len(new_pan_card_imgs_list)
 
-    for index in range(new_pan_card_imgs_len):
-        with open(new_pan_card_imgs[index], "rb") as img_file:
-            new_pan_card_imgs[index] = base64.b64encode(img_file.read()).decode("utf-8")
+    new_pan_card_imgs_dict = {}
+
+    for index in range(new_pan_card_imgs_list_len):
+        with open(new_pan_card_imgs_list[index], "rb") as img_file:
+            new_pan_card_imgs_dict[new_pan_card_imgs_list[index]] = base64.b64encode(img_file.read()).decode("utf-8")
+
+    del new_pan_card_imgs_list
 
 
 if __name__ == "__main__":
