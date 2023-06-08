@@ -103,10 +103,10 @@ def get_new_pan_card_images(pan_card_new_img_dir: str) -> List:
 
 
 def main():
-    PAN_CARD_NEW_IMG_DIR = get_dir_from_env("PAN_CARD_NEW_IMG_DIR")
-    PAN_CARD_ARCHIVED_IMG_DIR = get_dir_from_env("PAN_CARD_ARCHIVED_IMG_DIR")
+    PAN_CARD_NEW_IMGS_DIR = get_dir_from_env("PAN_CARD_NEW_IMGS_DIR")
+    PAN_CARD_ARCHIVED_IMGS_DIR = get_dir_from_env("PAN_CARD_ARCHIVED_IMGS_DIR")
 
-    new_pan_card_imgs_list = get_new_pan_card_images(PAN_CARD_NEW_IMG_DIR)
+    new_pan_card_imgs_list = get_new_pan_card_images(PAN_CARD_NEW_IMGS_DIR)
 
     if not new_pan_card_imgs_list:
         sys.exit()
