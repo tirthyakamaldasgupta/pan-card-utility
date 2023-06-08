@@ -58,7 +58,7 @@ def get_new_pan_card_images(pan_card_new_img_dir: str) -> List:
 
         return None
 
-    img_extns = [".jpg", ".JPG", ".png", ".PNG"]
+    img_extns = [".webp"]
     
     img_files = []
 
