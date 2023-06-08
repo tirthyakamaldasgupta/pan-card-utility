@@ -1,1 +1,1 @@
-# pan-card-automation
+# pan-card-verification-automator
