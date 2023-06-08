@@ -5,7 +5,9 @@ from dotenv import load_dotenv
 import os
 import logging
 import base64
-import httpx
+import requests
+import boto3
+from nanoid import generate
 
 
 load_dotenv()
@@ -64,7 +66,7 @@ def get_converted_img_data(new_imgs_list: List[str]) -> Dict[str, Dict[str, str]
 
                 new_imgs_dict[new_imgs_list[index]]["converted"] = None
 
-            logging.info(f"converted: '{new_imgs_dict[new_imgs_list[index]]}'")
+            logging.info(f"converted: '{new_imgs_list[index]}'")
 
     return new_imgs_dict
 
@@ -157,7 +159,10 @@ def main():
         "X_RAPIDAPI_HOST",
         "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI",
         "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID",
-        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID"
+        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID",
+        "AWS_REGION_NAME",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY"
     )
 
     PAN_CARD_NEW_IMGS_DIR = env_vars["PAN_CARD_NEW_IMGS_DIR"]
@@ -184,26 +189,56 @@ def main():
 
     del new_pan_card_imgs_list
 
-    # for new_pan_card_img in new_pan_card_imgs_dict:
-    #     pass
+    for new_pan_card_img in new_pan_card_imgs_dict.keys():
+        if not new_pan_card_imgs_dict[new_pan_card_img]["converted"]:
+            continue
 
-    # scheduler_api_resp = httpx.post(
-    #     url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
-    #     headers={
-    #         "content-type": "application/json",
-    #         "X-RapidAPI-Key": X_RAPIDAPI_KEY,
-    #         "X-RapidAPI-Host": X_RAPIDAPI_HOST
-    #     },
-    #     data={
-    #         "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
-    #         "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID,
-    #         "data": {
-    #             "document1": "https://5.imimg.com/data5/TP/US/MU/SELLER-51778781/pan-card-500x500.jpg"
-    #         }
-    #     }
-    # )
+        # scheduler_api_resp = requests.post(
+        #     url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
+        #     headers={
+        #         "content-type": "application/json",
+        #         "X-RapidAPI-Key": X_RAPIDAPI_KEY,
+        #         "X-RapidAPI-Host": X_RAPIDAPI_HOST
+        #     },
+        #     json={
+        #         "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
+        #         "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID,
+        #         "data": {
+        #             "document1": new_pan_card_imgs_dict[new_pan_card_img]["converted"]
+        #         }
+        #     }
+        # )
 
-    # print(scheduler_api_resp.json)
+        # TODO:
+
+        # Error handling
+
+        # scheduler_api_resp_json = scheduler_api_resp.json()
+
+        scheduler_api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30', 'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e', 'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '', 'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False, 'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}}, 'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
+
+        # TODO:
+
+        # Response schema validation
+
+        AWS_REGION_NAME = env_vars["AWS_REGION_NAME"]
+        AWS_ACCESS_KEY_ID = env_vars["AWS_ACCESS_KEY_ID"]
+        AWS_SECRET_ACCESS_KEY = env_vars["AWS_SECRET_ACCESS_KEY"]
+
+        dynamodb_client = boto3.resource(service_name="dynamodb", region_name=AWS_REGION_NAME, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+
+        pan_card_details_table = dynamodb_client.Table("pan_card_details")
+
+        if not pan_card_details_table.table_status == "ACTIVE":
+            # TODO:
+
+            # Instead of passing raise proper exception
+
+            pass
+
+        scheduler_api_resp_json["result"]["extraction_output"]["id"] = generate(alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_", size=12)
+
+        pan_card_details_table.put_item(Item=scheduler_api_resp_json["result"]["extraction_output"])
 
 
 if __name__ == "__main__":
