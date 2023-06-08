@@ -4,6 +4,7 @@ from typing import List
 from dotenv import load_dotenv
 import os
 import logging
+import base64
 
 
 load_dotenv()
@@ -79,10 +80,16 @@ def main():
     PAN_CARD_NEW_IMG_DIR = get_dir_from_env("PAN_CARD_NEW_IMG_DIR")
     PAN_CARD_ARCHIVED_IMG_DIR = get_dir_from_env("PAN_CARD_ARCHIVED_IMG_DIR")
 
-    new_pan_card_images = get_new_pan_card_images(PAN_CARD_NEW_IMG_DIR)
+    new_pan_card_imgs = get_new_pan_card_images(PAN_CARD_NEW_IMG_DIR)
 
-    if not new_pan_card_images:
+    if not new_pan_card_imgs:
         sys.exit()
+
+    new_pan_card_imgs_len = len(new_pan_card_imgs)
+
+    for index in range(new_pan_card_imgs_len):
+        with open(new_pan_card_imgs[index], "rb") as img_file:
+            new_pan_card_imgs[index] = base64.b64encode(img_file.read()).decode("utf-8")
 
 
 if __name__ == "__main__":
