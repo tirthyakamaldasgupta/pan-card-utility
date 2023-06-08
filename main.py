@@ -13,18 +13,33 @@ load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
 
-def get_converted_img_data(new_imgs_list: List) -> Dict:
+def get_converted_img_data(new_imgs_list: List[str]) -> Dict[str, Dict[str, str]]:
     """
-    Converts a list of image files to base64-encoded strings.
+    Converts a list of image files to base64-encoded strings and returns them as a dictionary.
 
     Args:
         new_imgs_list (List[str]): A list of image file paths.
 
     Returns:
-        Dict[str, str]: A dictionary where keys are image file paths and values are the corresponding base64-encoded strings.
+        Dict[str, Dict[str, str]]: A dictionary where keys are image file paths, and values are nested dictionaries containing the corresponding base64-encoded strings under the key 'converted'.
 
     Raises:
-        None
+        FileNotFoundError: If an image file is not found.
+        IsADirectoryError: If the provided path is a directory instead of a file.
+        base64.binascii.Error: If there is an error encoding the image data as base64.
+        UnicodeDecodeError: If there is an error decoding the base64-encoded data to UTF-8.
+
+    Example usage:
+        new_imgs_list = ["path/to/image1.jpg", "path/to/image2.png"]
+        
+        converted_imgs = get_converted_img_data(new_imgs_list)
+        
+        print(converted_imgs)
+
+    Note:
+        - The function assumes that the image files are readable and the necessary file permissions are available.
+        - If an error occurs during encoding or decoding, the corresponding image's 'converted' value will be set to None.
+        - Logging is used to capture any encountered errors.
 
     """
     new_imgs_list_len = len(new_imgs_list)
@@ -33,8 +48,23 @@ def get_converted_img_data(new_imgs_list: List) -> Dict:
 
     for index in range(new_imgs_list_len):
         with open(new_imgs_list[index], "rb") as img_file:
-            new_imgs_dict[new_imgs_list[index]] = base64.b64encode(img_file.read())
-            new_imgs_dict[new_imgs_list[index]] = new_imgs_dict[new_imgs_list[index]].decode("utf-8")
+            new_imgs_dict[new_imgs_list[index]] = {}
+
+            try:
+                new_imgs_dict[new_imgs_list[index]]["converted"] = base64.b64encode(img_file.read())
+            except base64.binascii.Error:
+                logging.error(base64.binascii.Error(f"'{new_imgs_list[index]}'"))
+                
+                new_imgs_dict[new_imgs_list[index]]["converted"] = None
+
+            try:
+                new_imgs_dict[new_imgs_list[index]]["converted"] = new_imgs_dict[new_imgs_list[index]]["converted"].decode("utf-8")
+            except UnicodeDecodeError:
+                logging.error(UnicodeDecodeError(f"'{new_imgs_list[index]}'"))
+
+                new_imgs_dict[new_imgs_list[index]]["converted"] = None
+
+            logging.info(f"converted: '{new_imgs_dict[new_imgs_list[index]]}'")
 
     return new_imgs_dict
 
@@ -52,6 +82,18 @@ def get_new_pan_card_images(pan_card_new_img_dir: str) -> List:
     Raises:
         None
 
+    Example usage:
+        pan_card_new_img_dir = "/path/to/new_pan_card_images/"
+        
+        new_pan_card_images = get_new_pan_card_images(pan_card_new_img_dir)
+        
+        print(new_pan_card_images)
+
+    Note:
+        - The function assumes that the specified directory exists and contains the new PAN card image files.
+        - The function searches for image files with the extension '.webp' in the specified directory.
+        - If the specified directory is empty or no new PAN card image files are found, None is returned.
+        - Logging is used to capture any encountered errors or to log information about the number of found images.
     """
     if not len(os.listdir(pan_card_new_img_dir)) > 0:
         logging.error(f"dir: '{pan_card_new_img_dir}' is empty")
@@ -75,7 +117,7 @@ def get_new_pan_card_images(pan_card_new_img_dir: str) -> List:
     return img_files
 
 
-def get_env_vars(*args) -> Dict[str, str]:
+def get_env_vars(*args: str) -> Dict[str, str]:
     """
     Retrieves environment variables and returns them as a dictionary.
 
@@ -113,9 +155,9 @@ def main():
         "PAN_CARD_ARCHIVED_IMGS_DIR",
         "X_RAPIDAPI_KEY",
         "X_RAPIDAPI_HOST",
-        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_URI",
-        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_TASK_ID",
-        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_GROUP_ID"
+        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI",
+        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID",
+        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID"
     )
 
     PAN_CARD_NEW_IMGS_DIR = env_vars["PAN_CARD_NEW_IMGS_DIR"]
@@ -129,9 +171,9 @@ def main():
     X_RAPIDAPI_KEY = env_vars["X_RAPIDAPI_KEY"]
     X_RAPIDAPI_HOST = env_vars["X_RAPIDAPI_HOST"]
 
-    PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_URI = env_vars["PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_URI"]
-    PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_TASK_ID = env_vars["PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_TASK_ID"]
-    PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_GROUP_ID = env_vars["PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_GROUP_ID"]
+    PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI = env_vars["PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI"]
+    PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID = env_vars["PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID"]
+    PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID = env_vars["PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID"]
 
     new_pan_card_imgs_list = get_new_pan_card_images(PAN_CARD_NEW_IMGS_DIR)
 
@@ -142,21 +184,26 @@ def main():
 
     del new_pan_card_imgs_list
 
-    # resp = httpx.post(
-    #     url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_URI,
+    # for new_pan_card_img in new_pan_card_imgs_dict:
+    #     pass
+
+    # scheduler_api_resp = httpx.post(
+    #     url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
     #     headers={
     #         "content-type": "application/json",
     #         "X-RapidAPI-Key": X_RAPIDAPI_KEY,
     #         "X-RapidAPI-Host": X_RAPIDAPI_HOST
     #     },
     #     data={
-    #         "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_TASK_ID,
-    #         "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_ENDPOINT_GROUP_ID,
+    #         "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
+    #         "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID,
     #         "data": {
     #             "document1": "https://5.imimg.com/data5/TP/US/MU/SELLER-51778781/pan-card-500x500.jpg"
     #         }
     #     }
     # )
+
+    # print(scheduler_api_resp.json)
 
 
 if __name__ == "__main__":
