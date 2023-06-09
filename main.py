@@ -50,6 +50,8 @@ def get_converted_img_data(new_imgs_list: List[str]) -> Dict[str, Dict[str, str]
 
     for index in range(new_imgs_list_len):
         with open(new_imgs_list[index], "rb") as img_file:
+            logging.info(f"converting: '{new_imgs_list[index]}'")
+
             new_imgs_dict[new_imgs_list[index]] = {}
 
             try:
@@ -191,29 +193,63 @@ def main():
 
     for new_pan_card_img in new_pan_card_imgs_dict.keys():
         if not new_pan_card_imgs_dict[new_pan_card_img]["converted"]:
+            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+
             continue
 
-        api_resp = requests.post(
-            url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
-            headers={
-                "content-type": "application/json",
-                "X-RapidAPI-Key": X_RAPIDAPI_KEY,
-                "X-RapidAPI-Host": X_RAPIDAPI_HOST
-            },
-            json={
-                "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
-                "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID,
-                "data": {
-                    "document1": new_pan_card_imgs_dict[new_pan_card_img]["converted"]
-                }
-            }
-        )
+        logging.info(f"extracting info for: '{new_pan_card_img}'")
+
+        try:
+            api_resp = requests.post(
+                url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
+                headers={
+                    "content-type": "application/json",
+                    "X-RapidAPI-Key": X_RAPIDAPI_KEY,
+                    "X-RapidAPI-Host": X_RAPIDAPI_HOST
+                },
+                json={
+                    "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
+                    "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID,
+                    "data": {
+                        "document1": new_pan_card_imgs_dict[new_pan_card_img]["converted"]
+                    }
+                },
+                timeout=10
+            )
+        except requests.exceptions.HTTPError as http_err:
+            logging.error(http_err)
+
+            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+
+            continue
+        except requests.exceptions.ConnectionError as conn_err:
+            logging.error(conn_err)
+
+            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+
+            continue
+        except requests.exceptions.Timeout as timeout_err:
+            logging.error(timeout_err)
+
+            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+
+            continue
+        except requests.exceptions.RequestException as err:
+            logging.error(err)
+
+            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+
+            continue
 
         if not api_resp.status_code == 200:
             try:
                 logging.error(api_resp.json())
+
+                new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
             except requests.exceptions.JSONDecodeError:
                 logging.error(api_resp.text)
+
+                new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
 
             continue
         
@@ -222,9 +258,13 @@ def main():
         except requests.exceptions.JSONDecodeError:
             logging.error(api_resp.text)
 
+            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+
             continue
 
         logging.info(api_resp_json)
+
+        logging.info(f"extracted info for: '{new_pan_card_img}'")
 
         # api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30', 'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e', 'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '', 'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False, 'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}}, 'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
 
@@ -251,6 +291,10 @@ def main():
         api_resp_json["result"]["extraction_output"]["verification"] = "pending"
 
         pan_card_details_table.put_item(Item=api_resp_json["result"]["extraction_output"])
+
+        new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = True
+
+    print(new_pan_card_imgs_dict)
 
 
 if __name__ == "__main__":
