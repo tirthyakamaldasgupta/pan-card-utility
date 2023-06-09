@@ -193,29 +193,40 @@ def main():
         if not new_pan_card_imgs_dict[new_pan_card_img]["converted"]:
             continue
 
-        # scheduler_api_resp = requests.post(
-        #     url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
-        #     headers={
-        #         "content-type": "application/json",
-        #         "X-RapidAPI-Key": X_RAPIDAPI_KEY,
-        #         "X-RapidAPI-Host": X_RAPIDAPI_HOST
-        #     },
-        #     json={
-        #         "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
-        #         "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID,
-        #         "data": {
-        #             "document1": new_pan_card_imgs_dict[new_pan_card_img]["converted"]
-        #         }
-        #     }
-        # )
+        api_resp = requests.post(
+            url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
+            headers={
+                "content-type": "application/json",
+                "X-RapidAPI-Key": X_RAPIDAPI_KEY,
+                "X-RapidAPI-Host": X_RAPIDAPI_HOST
+            },
+            json={
+                "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
+                "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID,
+                "data": {
+                    "document1": new_pan_card_imgs_dict[new_pan_card_img]["converted"]
+                }
+            }
+        )
 
-        # TODO:
+        if not api_resp.status_code == 200:
+            try:
+                logging.error(api_resp.json())
+            except requests.exceptions.JSONDecodeError:
+                logging.error(api_resp.text)
 
-        # Error handling
+            continue
+        
+        try:
+            api_resp_json = api_resp.json()
+        except requests.exceptions.JSONDecodeError:
+            logging.error(api_resp.text)
 
-        # scheduler_api_resp_json = scheduler_api_resp.json()
+            continue
 
-        scheduler_api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30', 'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e', 'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '', 'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False, 'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}}, 'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
+        logging.info(api_resp_json)
+
+        # api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30', 'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e', 'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '', 'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False, 'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}}, 'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
 
         # TODO:
 
@@ -236,10 +247,10 @@ def main():
 
             pass
 
-        scheduler_api_resp_json["result"]["extraction_output"]["id"] = generate(alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_", size=12)
-        scheduler_api_resp_json["result"]["extraction_output"]["verified"] = False
+        api_resp_json["result"]["extraction_output"]["id"] = generate(alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_", size=12)
+        api_resp_json["result"]["extraction_output"]["verification"] = "pending"
 
-        pan_card_details_table.put_item(Item=scheduler_api_resp_json["result"]["extraction_output"])
+        pan_card_details_table.put_item(Item=api_resp_json["result"]["extraction_output"])
 
 
 if __name__ == "__main__":
