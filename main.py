@@ -1,4 +1,5 @@
 import glob
+import shutil
 import sys
 from typing import Dict, List
 from dotenv import load_dotenv
@@ -289,8 +290,16 @@ def main():
 
         new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = True
 
-    print(new_pan_card_imgs_dict)
-    
+        new_pan_card_img_file_name = os.path.basename(new_pan_card_img)
+        
+        archived_pan_card_img = os.path.join(PAN_CARD_ARCHIVED_IMGS_DIR, new_pan_card_img_file_name)
+
+        logging.info(f"moving: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
+
+        shutil.move(new_pan_card_img, archived_pan_card_img)
+
+        logging.info(f"moved: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
+
 
 if __name__ == "__main__":
     main()
