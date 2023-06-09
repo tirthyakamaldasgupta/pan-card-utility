@@ -6,9 +6,8 @@ from dotenv import load_dotenv
 import os
 import logging
 import base64
+import pymysql
 import requests
-import boto3
-from nanoid import generate
 
 __author__ = "Tirthya Kamal Dasgupta"
 
@@ -157,6 +156,8 @@ def get_env_vars(*args: str) -> Dict[str, str]:
 
 
 def main():
+    logging.info("obtaining env vars")
+
     env_vars = get_env_vars(
         "PAN_CARD_NEW_IMGS_DIR",
         "PAN_CARD_ARCHIVED_IMGS_DIR",
@@ -165,18 +166,33 @@ def main():
         "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI",
         "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID",
         "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID",
-        "AWS_REGION_NAME",
-        "AWS_ACCESS_KEY_ID",
-        "AWS_SECRET_ACCESS_KEY"
+        "DB_HOST",
+        "DB_USERNAME",
+        "DB_PASSWORD",
+        "DB_NAME"
     )
 
-    AWS_REGION_NAME = env_vars["AWS_REGION_NAME"]
-    AWS_ACCESS_KEY_ID = env_vars["AWS_ACCESS_KEY_ID"]
-    AWS_SECRET_ACCESS_KEY = env_vars["AWS_SECRET_ACCESS_KEY"]
+    logging.info("obtained env vars")
 
-    dynamodb_client = boto3.resource(service_name="dynamodb", region_name=AWS_REGION_NAME, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+    DB_HOST = env_vars["DB_HOST"]
+    DB_USERNAME = env_vars["DB_USERNAME"]
+    DB_PASSWORD = env_vars["DB_PASSWORD"]
+    DB_NAME = env_vars["DB_NAME"]
 
-    pan_card_details_table = dynamodb_client.Table("pan_card_details")
+    connection = pymysql.connect(
+        host= DB_HOST,
+        user=DB_USERNAME,
+        password=DB_PASSWORD,
+        database=DB_NAME,
+        autocommit=True,
+        ssl={
+            "ssl": {
+                "ca": "/etc/ssl/cert.pem"
+            }
+        }
+    )
+
+    logging.info("database connection established")
 
     PAN_CARD_NEW_IMGS_DIR = env_vars["PAN_CARD_NEW_IMGS_DIR"]
     PAN_CARD_ARCHIVED_IMGS_DIR = env_vars["PAN_CARD_ARCHIVED_IMGS_DIR"]
@@ -204,8 +220,6 @@ def main():
 
     for new_pan_card_img in new_pan_card_imgs_dict.keys():
         if not new_pan_card_imgs_dict[new_pan_card_img]["converted"]:
-            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
-
             continue
 
         logging.info(f"extracting info for: '{new_pan_card_img}'")
@@ -230,37 +244,33 @@ def main():
         except requests.exceptions.HTTPError as http_err:
             logging.error(http_err)
 
-            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+            logging.error(f"failed to extract info for: '{new_pan_card_img}'")
 
             continue
         except requests.exceptions.ConnectionError as conn_err:
             logging.error(conn_err)
 
-            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+            logging.error(f"failed to extract info for: '{new_pan_card_img}'")
 
             continue
         except requests.exceptions.Timeout as timeout_err:
             logging.error(timeout_err)
 
-            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+            logging.error(f"failed to extract info for: '{new_pan_card_img}'")
 
             continue
         except requests.exceptions.RequestException as err:
             logging.error(err)
 
-            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
+            logging.error(f"failed to extract info for: '{new_pan_card_img}'")
 
             continue
 
         if not api_resp.status_code == 200:
             try:
                 logging.error(api_resp.json())
-
-                new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
             except requests.exceptions.JSONDecodeError:
                 logging.error(api_resp.text)
-
-                new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
 
             continue
         
@@ -268,8 +278,6 @@ def main():
             api_resp_json = api_resp.json()
         except requests.exceptions.JSONDecodeError:
             logging.error(api_resp.text)
-
-            new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = False
 
             continue
 
@@ -283,12 +291,30 @@ def main():
 
         # Response schema validation
 
-        api_resp_json["result"]["extraction_output"]["id"] = generate(alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_", size=12)
-        api_resp_json["result"]["extraction_output"]["verification"] = "pending"
+        api_resp_json["result"]["extraction_output"]["is_scanned"] = 1 if api_resp_json["result"]["extraction_output"]["is_scanned"] else 0
+        api_resp_json["result"]["extraction_output"]["minor"] = 1 if api_resp_json["result"]["extraction_output"]["minor"] else 0
+        api_resp_json["result"]["extraction_output"]["date_of_issue"] = api_resp_json["result"]["extraction_output"]["date_of_issue"] if api_resp_json["result"]["extraction_output"]["date_of_issue"] else "0000-00-00"
+        api_resp_json["result"]["extraction_output"]["verified"] = 0
 
-        pan_card_details_table.put_item(Item=api_resp_json["result"]["extraction_output"])
+        logging.info(f"inserting metadata into database for: '{new_pan_card_img}'")
 
-        new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = True
+        with connection.cursor() as cursor:
+            try:
+                statement = "SET SQL_MODE='ALLOW_INVALID_DATES'"
+
+                cursor.execute(statement)
+
+                statement = f"INSERT INTO pan_card_details (`age`, `date_of_birth`, `date_of_issue`, `fathers_name`, `id_number`, `is_scanned`, `minor`, `name_on_card`, `pan_type`, `verified`) VALUES ({api_resp_json['result']['extraction_output']['age']}, STR_TO_DATE('{api_resp_json['result']['extraction_output']['date_of_birth']}', '%Y-%m-%d'), STR_TO_DATE('{api_resp_json['result']['extraction_output']['date_of_issue']}', '%Y-%m-%d'), '{api_resp_json['result']['extraction_output']['fathers_name']}', '{api_resp_json['result']['extraction_output']['id_number']}', {api_resp_json['result']['extraction_output']['is_scanned']}, {api_resp_json['result']['extraction_output']['minor']}, '{api_resp_json['result']['extraction_output']['name_on_card']}', '{api_resp_json['result']['extraction_output']['pan_type']}', 0)"
+                
+                cursor.execute(statement)
+            except pymysql.Error as err:
+                logging.error(err)
+
+                logging.error(f"failed to insert metadata into database for: '{new_pan_card_img}'")
+
+                continue
+        
+        logging.info(f"inserted metadata into database for: '{new_pan_card_img}'")
 
         new_pan_card_img_file_name = os.path.basename(new_pan_card_img)
         
