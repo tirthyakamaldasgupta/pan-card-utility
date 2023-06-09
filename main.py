@@ -9,6 +9,8 @@ import requests
 import boto3
 from nanoid import generate
 
+__author__ = "Tirthya Kamal Dasgupta"
+
 
 load_dotenv()
 
@@ -167,6 +169,14 @@ def main():
         "AWS_SECRET_ACCESS_KEY"
     )
 
+    AWS_REGION_NAME = env_vars["AWS_REGION_NAME"]
+    AWS_ACCESS_KEY_ID = env_vars["AWS_ACCESS_KEY_ID"]
+    AWS_SECRET_ACCESS_KEY = env_vars["AWS_SECRET_ACCESS_KEY"]
+
+    dynamodb_client = boto3.resource(service_name="dynamodb", region_name=AWS_REGION_NAME, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+
+    pan_card_details_table = dynamodb_client.Table("pan_card_details")
+
     PAN_CARD_NEW_IMGS_DIR = env_vars["PAN_CARD_NEW_IMGS_DIR"]
     PAN_CARD_ARCHIVED_IMGS_DIR = env_vars["PAN_CARD_ARCHIVED_IMGS_DIR"]
 
@@ -262,30 +272,15 @@ def main():
 
             continue
 
+        api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30', 'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e', 'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '', 'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False, 'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}}, 'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
+
         logging.info(api_resp_json)
 
         logging.info(f"extracted info for: '{new_pan_card_img}'")
 
-        # api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30', 'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e', 'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '', 'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False, 'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}}, 'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
-
         # TODO:
 
         # Response schema validation
-
-        AWS_REGION_NAME = env_vars["AWS_REGION_NAME"]
-        AWS_ACCESS_KEY_ID = env_vars["AWS_ACCESS_KEY_ID"]
-        AWS_SECRET_ACCESS_KEY = env_vars["AWS_SECRET_ACCESS_KEY"]
-
-        dynamodb_client = boto3.resource(service_name="dynamodb", region_name=AWS_REGION_NAME, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
-
-        pan_card_details_table = dynamodb_client.Table("pan_card_details")
-
-        if not pan_card_details_table.table_status == "ACTIVE":
-            # TODO:
-
-            # Instead of passing raise proper exception
-
-            pass
 
         api_resp_json["result"]["extraction_output"]["id"] = generate(alphabet="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_", size=12)
         api_resp_json["result"]["extraction_output"]["verification"] = "pending"
@@ -295,7 +290,7 @@ def main():
         new_pan_card_imgs_dict[new_pan_card_img]["ocr_extraction_status"] = True
 
     print(new_pan_card_imgs_dict)
-
+    
 
 if __name__ == "__main__":
     main()
