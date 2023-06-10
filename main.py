@@ -292,8 +292,11 @@ def main():
         # Response schema validation
 
         api_resp_json["result"]["extraction_output"]["is_scanned"] = 1 if api_resp_json["result"]["extraction_output"]["is_scanned"] else 0
+        
         api_resp_json["result"]["extraction_output"]["minor"] = 1 if api_resp_json["result"]["extraction_output"]["minor"] else 0
+        
         api_resp_json["result"]["extraction_output"]["date_of_issue"] = api_resp_json["result"]["extraction_output"]["date_of_issue"] if api_resp_json["result"]["extraction_output"]["date_of_issue"] else "0000-00-00"
+        
         api_resp_json["result"]["extraction_output"]["verified"] = 0
 
         logging.info(f"inserting metadata into database for: '{new_pan_card_img}'")
@@ -322,7 +325,14 @@ def main():
 
         logging.info(f"moving: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
 
-        shutil.move(new_pan_card_img, archived_pan_card_img)
+        try:
+            shutil.move(new_pan_card_img, archived_pan_card_img)
+        except FileNotFoundError as fnf_err:
+            logging.error(fnf_err)
+
+            logging.error(f"failed to move: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
+
+            continue
 
         logging.info(f"moved: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
 
