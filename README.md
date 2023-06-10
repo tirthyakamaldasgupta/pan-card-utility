@@ -115,7 +115,7 @@ To get a local copy up and running follow these simple example steps.
 
 3. Copy the sample image from the **images** folder or place your own images inside the **pan-card-new-images** directory.
 
-4. Create a **.env** file at the root of the project directory and populate it with the specified parameters (refer to [here](here) for the parameters).
+4. Create a **.env** file at the root of the project directory and populate it with the specified parameters (refer to [here](#environment-file-variables) for the parameters).
 
 5. Populate the **.env** file with the necessary parameters and their corresponding values.
 
@@ -143,7 +143,7 @@ To get a local copy up and running follow these simple example steps.
    docker pull tirthyakamaldasgupta/pan-card-utility
    ```
 
-2. Create a **.env** file anywhere and populate it with the specified parameters (refer to [here](here) for the parameters).
+2. Create a **.env** file anywhere and populate it with the specified parameters (refer to [here](#environment-file-variables) for the parameters).
 
 3. Create the following directories anywhere:
    - **pan-card-new-images**
@@ -192,9 +192,23 @@ To get a local copy up and running follow these simple example steps.
 
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+#### Environment file variables
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+| Name                                               | Value                                                                           |
+|----------------------------------------------------|---------------------------------------------------------------------------------|
+| **X_RAPIDAPI_KEY**                                 | Your RapidAPI key.                                                              |
+| **X_RAPIDAPI_HOST**                                | Your RapidAPI host.                                                             |
+| **PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI**      | The URL of the PAN Card OCR extraction API.                                     |
+| **PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID**  | The task ID for the PAN Card OCR extraction API.                                |
+| **PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID** | The group ID for the PAN Card OCR extraction API.                               |
+| **DB_HOST**                                        | The host address of the database server.                                        |
+| **DB_USERNAME**                                    | The username for accessing the database.                                        |
+| **DB_PASSWORD**                                    | The password for accessing the database.                                        |
+| **DB_NAME**                                        | The name of the database to store the metadata.                                 |
+
+##### Environment variables reference
+
+Refer to the [Prerequisites](#prerequisites) section for instructions on how to obtain the values for the environment variables.
 
 ## Roadmap
 
