@@ -151,15 +151,44 @@ To get a local copy up and running follow these simple example steps.
 
 4. Put the PAN card images or download a sample image from [here](https://github.com/tirthyakamaldasgupta/pan-card-utility/blame/99c34cf237d4765c5d30ca60857f21086f99f08e/images/sample-pan-card-image-one.webp) and place it inside the **pan-card-new-images** folder.
 
-5. Create a container and run it each time you want to execute the application:
+5. Create a container and run it each time you want to execute the application by issuing the following command:
    ```shell
-   docker run --env-file <**.env** file path> -it -v <**pan-card-new-images** directory path>:/usr/src/app/pan-card-new-images -v <**pan-card-archived-images** directory path>:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility pan-card-utility
+   docker run --env-file <**.env** file path> -it -v <**pan-card-new-images** directory path>:/usr/src/app/pan-card-new-images -v <**pan-card-archived-images** directory path>:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility <your preferred container name>
+   ```
+
+   **Example**
+   ```shell
+   docker run --env-file .env -it -v /Users/tirthyakamaldasgupta/Downloads/Projects/Production/POCs/pan-card-utility/pan-card-new-images:/usr/src/app/pan-card-new-images -v /Users/tirthyakamaldasgupta/Downloads/Projects/Production/POCs/pan-card-utility/pan-card-archived-images:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility pan-card-utility
+   ```
+
+#### Build Docker image from source and running in the form of a container:
+
+1. Clone the repository: [https://github.com/tirthyakamaldasgupta/pan-card-utility](https://github.com/tirthyakamaldasgupta/pan-card-utility).
+
+2. Build the Docker image by running the following command inside the root directory of the project:
+   ```shell
+   docker build --no-cache -t <your preferred image name> .
    ```
 
    **Example:**
    ```shell
-   docker run --env-file .env -it -v /Users/tirthyakamaldasgupta/Downloads/Projects/Production/POCs/pan-card-utility/pan-card-new-images:/usr/src/app/pan-card-new-images -v /Users/tirthyakamaldasgupta/Downloads/Projects/Production/POCs/pan-card-utility/pan-card-archived-images:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility pan-card-utility
+   docker build --no-cache -t my-pan-card-utility .
    ```
+
+3. Follow the steps for creating and running the container [here]().
+
+   **Notes:**
+   1. Skip step 1 of the section since you are building the image from scratch.
+   2. Modify the command mentioned in step 5 before executing it, as follows:
+       ```shell
+       docker run --env-file <**.env** file path> -it -v <**pan-card-new-images** directory path>:/usr/src/app/pan-card-new-images -v <**pan-card-archived-images** directory path>:/usr/src/app/pan-card-archived-images --rm --name <your image name> <your preferred container name>
+       ```
+
+       **Example:**
+       ```shell
+       docker run --env-file .env -it -v /path/to/pan-card-new-images:/usr/src/app/pan-card-new-images -v /path/to/pan-card-archived-images:/usr/src/app/pan-card-archived-images --rm --name my-pan-card-utility my-pan-card-utility-container
+       ```
+
 
 ## Usage
 
