@@ -161,3 +161,7 @@ cython_debug/
 
 # MAC generated files
 .DS_Store
+
+# Images directory
+pan-card-new-images
+pan-card-archived-images
