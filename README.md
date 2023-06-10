@@ -175,7 +175,7 @@ To get a local copy up and running follow these simple example steps.
    docker build --no-cache -t my-pan-card-utility .
    ```
 
-3. Follow the steps for creating and running the container [here]().
+3. Follow the steps for creating and running the container [here](#running-in-the-form-of-a-docker-container).
 
    **Notes:**
    1. Skip step 1 of the section since you are building the image from scratch.
