@@ -1,4 +1,5 @@
 anyio==3.7.0
+attrs==23.1.0
 botocore==1.29.149
 certifi==2023.5.7
 charset-normalizer==3.1.0
@@ -7,7 +8,9 @@ h11==0.14.0
 httpcore==0.17.2
 idna==3.4
 jmespath==1.0.1
+jsonschema==4.17.3
 PyMySQL==1.0.3
+pyrsistent==0.19.3
 python-dateutil==2.8.2
 python-dotenv==1.0.0
 requests==2.31.0

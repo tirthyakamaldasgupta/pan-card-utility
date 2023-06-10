@@ -1,4 +1,5 @@
 import glob
+import json
 import shutil
 import sys
 from typing import Dict, List
@@ -6,6 +7,7 @@ from dotenv import load_dotenv
 import os
 import logging
 import base64
+import jsonschema
 import pymysql
 import requests
 
@@ -196,6 +198,11 @@ def main():
 
     logging.info("database connection established")
 
+    with open("schemas/extracted-data-schema.json", "r") as extracted_data_schema_file:
+        extracted_data_schema = json.loads(extracted_data_schema_file.read())
+
+    logging.info("schema representing extracted data loaded")
+
     PAN_CARD_NEW_IMGS_DIR = env_vars["PAN_CARD_NEW_IMGS_DIR"]
     PAN_CARD_ARCHIVED_IMGS_DIR = env_vars["PAN_CARD_ARCHIVED_IMGS_DIR"]
 
@@ -291,9 +298,20 @@ def main():
 
         logging.info(f"extracted info for: '{new_pan_card_img}'")
 
-        # TODO:
+        logging.info(f"validating extracted data against schema for: '{new_pan_card_img}'")
 
-        # Response schema validation
+        try:
+            jsonschema.validate(
+                instance=api_resp_json, schema=extracted_data_schema
+            )
+        except jsonschema.ValidationError as validation_err:
+            logging.error(validation_err)
+
+            logging.error(f"failed to validate extracted data against schema for: '{new_pan_card_img}'")
+
+            continue
+        
+        logging.info(f"validated extracted data against schema for: '{new_pan_card_img}'")
 
         api_resp_json["result"]["extraction_output"]["is_scanned"] = 1 if api_resp_json["result"]["extraction_output"]["is_scanned"] else 0
         
