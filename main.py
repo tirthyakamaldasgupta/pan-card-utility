@@ -51,9 +51,9 @@ def get_converted_img_data(new_imgs_list: List[str]) -> Dict[str, Dict[str, str]
     new_imgs_dict = {}
 
     for index in range(new_imgs_list_len):
-        with open(new_imgs_list[index], "rb") as img_file:
-            logging.info(f"converting: '{new_imgs_list[index]}'")
+        logging.info(f"converting: '{new_imgs_list[index]}'")
 
+        with open(new_imgs_list[index], "rb") as img_file:
             new_imgs_dict[new_imgs_list[index]] = {}
 
             try:
@@ -70,7 +70,7 @@ def get_converted_img_data(new_imgs_list: List[str]) -> Dict[str, Dict[str, str]
 
                 new_imgs_dict[new_imgs_list[index]]["converted"] = None
 
-            logging.info(f"converted: '{new_imgs_list[index]}'")
+        logging.info(f"converted: '{new_imgs_list[index]}'")
 
     return new_imgs_dict
 
@@ -150,6 +150,8 @@ def get_env_vars(*args: str) -> Dict[str, str]:
         env_vars[arg] = os.getenv(arg)
 
         if not env_vars[arg]:
+            logging.error(f"failed to load env vars")
+
             raise EnvironmentError(f"'{arg}'")
 
     return env_vars
@@ -196,6 +198,8 @@ def main():
 
     PAN_CARD_NEW_IMGS_DIR = env_vars["PAN_CARD_NEW_IMGS_DIR"]
     PAN_CARD_ARCHIVED_IMGS_DIR = env_vars["PAN_CARD_ARCHIVED_IMGS_DIR"]
+
+    logging.info(f"finding dir: '{PAN_CARD_NEW_IMGS_DIR}'")
 
     if not os.path.exists(PAN_CARD_NEW_IMGS_DIR):
         raise NotADirectoryError(f"'{PAN_CARD_NEW_IMGS_DIR}'")
