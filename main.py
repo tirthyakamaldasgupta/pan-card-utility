@@ -160,6 +160,28 @@ def get_env_vars(*args: str) -> Dict[str, str]:
 
 
 def main():
+    """
+    The main entry point of the program.
+    
+    This function performs the following tasks:
+    1. Obtains necessary environment variables.
+    2. Establishes a database connection.
+    3. Loads a schema representing extracted data.
+    4. Retrieves a list of new PAN card images from a directory.
+    5. Processes the new PAN card images and converts them.
+    6. Extracts information from the converted images using an OCR API.
+    7. Validates the extracted data against a schema.
+    8. Inserts the metadata into a database.
+    9. Archives the processed images by moving them to a different directory.
+
+    Note: The function assumes the presence of certain environment variables and file paths.
+
+    Raises:
+        NotADirectoryError: If the specified directory for new/archived PAN card images doesn't exist.
+
+    Returns:
+        None
+    """
     logging.info("obtaining env vars")
 
     env_vars = get_env_vars(
@@ -182,6 +204,8 @@ def main():
     DB_USERNAME = env_vars["DB_USERNAME"]
     DB_PASSWORD = env_vars["DB_PASSWORD"]
     DB_NAME = env_vars["DB_NAME"]
+
+    logging.info("establishing database connection")
 
     connection = pymysql.connect(
         host= DB_HOST,
@@ -210,6 +234,9 @@ def main():
 
     if not os.path.exists(PAN_CARD_NEW_IMGS_DIR):
         raise NotADirectoryError(f"'{PAN_CARD_NEW_IMGS_DIR}'")
+    
+    if not os.path.exists(PAN_CARD_ARCHIVED_IMGS_DIR):
+        raise NotADirectoryError(f"'{PAN_CARD_ARCHIVED_IMGS_DIR}'")
     
     logging.info(f"found dir: '{PAN_CARD_NEW_IMGS_DIR}'")
 
