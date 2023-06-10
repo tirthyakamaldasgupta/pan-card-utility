@@ -240,6 +240,5 @@ Distributed under the MIT License. See [LICENSE](https://github.com/tirthyakamal
 
 ## Acknowledgements
 
-* []()
-* [Othneil Drew](https://github.com/othneildrew/Best-README-Template)
-* []()
+* [Mehwish](https://www.flaticon.com/free-icon/id-card_4489837)
+* [Graphix's Art](https://www.flaticon.com/free-icons/settings)
