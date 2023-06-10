@@ -1,18 +1,17 @@
+import base64
 import glob
 import json
-import shutil
-import sys
-from typing import Dict, List
-from dotenv import load_dotenv
-import os
-import logging
-import base64
 import jsonschema
+import logging
+import os
 import pymysql
 import requests
+import shutil
+import sys
+from dotenv import load_dotenv
+from typing import Dict, List
 
 __author__ = "Tirthya Kamal Dasgupta"
-
 
 load_dotenv()
 
@@ -62,11 +61,12 @@ def get_converted_img_data(new_imgs_list: List[str]) -> Dict[str, Dict[str, str]
                 new_imgs_dict[new_imgs_list[index]]["converted"] = base64.b64encode(img_file.read())
             except base64.binascii.Error:
                 logging.error(base64.binascii.Error(f"'{new_imgs_list[index]}'"))
-                
+
                 new_imgs_dict[new_imgs_list[index]]["converted"] = None
 
             try:
-                new_imgs_dict[new_imgs_list[index]]["converted"] = new_imgs_dict[new_imgs_list[index]]["converted"].decode("utf-8")
+                new_imgs_dict[new_imgs_list[index]]["converted"] = new_imgs_dict[new_imgs_list[index]][
+                    "converted"].decode("utf-8")
             except UnicodeDecodeError:
                 logging.error(UnicodeDecodeError(f"'{new_imgs_list[index]}'"))
 
@@ -109,7 +109,7 @@ def get_new_pan_card_images(pan_card_new_img_dir: str) -> List:
         return None
 
     img_extns = [".webp"]
-    
+
     img_files = []
 
     for ext in img_extns:
@@ -184,19 +184,9 @@ def main():
     """
     logging.info("obtaining env vars")
 
-    env_vars = get_env_vars(
-        "PAN_CARD_NEW_IMGS_DIR",
-        "PAN_CARD_ARCHIVED_IMGS_DIR",
-        "X_RAPIDAPI_KEY",
-        "X_RAPIDAPI_HOST",
-        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI",
-        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID",
-        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID",
-        "DB_HOST",
-        "DB_USERNAME",
-        "DB_PASSWORD",
-        "DB_NAME"
-    )
+    env_vars = get_env_vars("X_RAPIDAPI_KEY", "X_RAPIDAPI_HOST",
+        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI", "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID",
+        "PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID", "DB_HOST", "DB_USERNAME", "DB_PASSWORD", "DB_NAME")
 
     logging.info("obtained env vars")
 
@@ -207,18 +197,8 @@ def main():
 
     logging.info("establishing database connection")
 
-    connection = pymysql.connect(
-        host= DB_HOST,
-        user=DB_USERNAME,
-        password=DB_PASSWORD,
-        database=DB_NAME,
-        autocommit=True,
-        ssl={
-            "ssl": {
-                "ca": "/etc/ssl/cert.pem"
-            }
-        }
-    )
+    connection = pymysql.connect(host=DB_HOST, user=DB_USERNAME, password=DB_PASSWORD, database=DB_NAME,
+        autocommit=True, ssl={"ssl": {"ca": "/etc/ssl/cert.pem"}})
 
     logging.info("database connection established")
 
@@ -227,17 +207,17 @@ def main():
 
     logging.info("schema representing extracted data loaded")
 
-    PAN_CARD_NEW_IMGS_DIR = env_vars["PAN_CARD_NEW_IMGS_DIR"]
-    PAN_CARD_ARCHIVED_IMGS_DIR = env_vars["PAN_CARD_ARCHIVED_IMGS_DIR"]
+    PAN_CARD_NEW_IMGS_DIR = "pan-card-new-images"
+    PAN_CARD_ARCHIVED_IMGS_DIR = "pan-card-archived-images"
 
     logging.info(f"finding dir: '{PAN_CARD_NEW_IMGS_DIR}'")
 
     if not os.path.exists(PAN_CARD_NEW_IMGS_DIR):
         raise NotADirectoryError(f"'{PAN_CARD_NEW_IMGS_DIR}'")
-    
+
     if not os.path.exists(PAN_CARD_ARCHIVED_IMGS_DIR):
         raise NotADirectoryError(f"'{PAN_CARD_ARCHIVED_IMGS_DIR}'")
-    
+
     logging.info(f"found dir: '{PAN_CARD_NEW_IMGS_DIR}'")
 
     X_RAPIDAPI_KEY = env_vars["X_RAPIDAPI_KEY"]
@@ -263,22 +243,11 @@ def main():
         logging.info(f"extracting info for: '{new_pan_card_img}'")
 
         try:
-            api_resp = requests.post(
-                url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
-                headers={
-                    "content-type": "application/json",
-                    "X-RapidAPI-Key": X_RAPIDAPI_KEY,
-                    "X-RapidAPI-Host": X_RAPIDAPI_HOST
-                },
-                json={
-                    "task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
+            api_resp = requests.post(url=PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_URI,
+                headers={"content-type": "application/json", "X-RapidAPI-Key": X_RAPIDAPI_KEY,
+                    "X-RapidAPI-Host": X_RAPIDAPI_HOST}, json={"task_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_TASK_ID,
                     "group_id": PAN_CARD_OCR_EXTRACTION_SCHEDULER_API_GROUP_ID,
-                    "data": {
-                        "document1": new_pan_card_imgs_dict[new_pan_card_img]["converted"]
-                    }
-                },
-                timeout=10
-            )
+                    "data": {"document1": new_pan_card_imgs_dict[new_pan_card_img]["converted"]}}, timeout=10)
         except requests.exceptions.HTTPError as http_err:
             logging.error(http_err)
 
@@ -311,7 +280,7 @@ def main():
                 logging.error(api_resp.text)
 
             continue
-        
+
         try:
             api_resp_json = api_resp.json()
         except requests.exceptions.JSONDecodeError:
@@ -319,7 +288,13 @@ def main():
 
             continue
 
-        api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30', 'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e', 'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '', 'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False, 'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}}, 'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
+        api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30',
+                         'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e',
+                         'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {
+                'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '',
+                                      'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False,
+                                      'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}},
+                         'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
 
         logging.info(api_resp_json)
 
@@ -328,24 +303,25 @@ def main():
         logging.info(f"validating extracted data against schema for: '{new_pan_card_img}'")
 
         try:
-            jsonschema.validate(
-                instance=api_resp_json, schema=extracted_data_schema
-            )
+            jsonschema.validate(instance=api_resp_json, schema=extracted_data_schema)
         except jsonschema.ValidationError as validation_err:
             logging.error(validation_err)
 
             logging.error(f"failed to validate extracted data against schema for: '{new_pan_card_img}'")
 
             continue
-        
+
         logging.info(f"validated extracted data against schema for: '{new_pan_card_img}'")
 
-        api_resp_json["result"]["extraction_output"]["is_scanned"] = 1 if api_resp_json["result"]["extraction_output"]["is_scanned"] else 0
-        
-        api_resp_json["result"]["extraction_output"]["minor"] = 1 if api_resp_json["result"]["extraction_output"]["minor"] else 0
-        
-        api_resp_json["result"]["extraction_output"]["date_of_issue"] = api_resp_json["result"]["extraction_output"]["date_of_issue"] if api_resp_json["result"]["extraction_output"]["date_of_issue"] else "0000-00-00"
-        
+        api_resp_json["result"]["extraction_output"]["is_scanned"] = 1 if api_resp_json["result"]["extraction_output"][
+            "is_scanned"] else 0
+
+        api_resp_json["result"]["extraction_output"]["minor"] = 1 if api_resp_json["result"]["extraction_output"][
+            "minor"] else 0
+
+        api_resp_json["result"]["extraction_output"]["date_of_issue"] = api_resp_json["result"]["extraction_output"][
+            "date_of_issue"] if api_resp_json["result"]["extraction_output"]["date_of_issue"] else "0000-00-00"
+
         api_resp_json["result"]["extraction_output"]["verified"] = 0
 
         logging.info(f"inserting metadata into database for: '{new_pan_card_img}'")
@@ -357,7 +333,7 @@ def main():
                 cursor.execute(statement)
 
                 statement = f"INSERT INTO pan_card_details (`age`, `date_of_birth`, `date_of_issue`, `fathers_name`, `id_number`, `is_scanned`, `minor`, `name_on_card`, `pan_type`, `verified`) VALUES ({api_resp_json['result']['extraction_output']['age']}, STR_TO_DATE('{api_resp_json['result']['extraction_output']['date_of_birth']}', '%Y-%m-%d'), STR_TO_DATE('{api_resp_json['result']['extraction_output']['date_of_issue']}', '%Y-%m-%d'), '{api_resp_json['result']['extraction_output']['fathers_name']}', '{api_resp_json['result']['extraction_output']['id_number']}', {api_resp_json['result']['extraction_output']['is_scanned']}, {api_resp_json['result']['extraction_output']['minor']}, '{api_resp_json['result']['extraction_output']['name_on_card']}', '{api_resp_json['result']['extraction_output']['pan_type']}', 0)"
-                
+
                 cursor.execute(statement)
             except pymysql.Error as err:
                 logging.error(err)
@@ -365,25 +341,28 @@ def main():
                 logging.error(f"failed to insert metadata into database for: '{new_pan_card_img}'")
 
                 continue
-        
+
         logging.info(f"inserted metadata into database for: '{new_pan_card_img}'")
 
         new_pan_card_img_file_name = os.path.basename(new_pan_card_img)
-        
+
         archived_pan_card_img = os.path.join(PAN_CARD_ARCHIVED_IMGS_DIR, new_pan_card_img_file_name)
 
-        logging.info(f"moving: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
+        logging.info(
+            f"moving: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
 
         try:
             shutil.move(new_pan_card_img, archived_pan_card_img)
         except FileNotFoundError as fnf_err:
             logging.error(fnf_err)
 
-            logging.error(f"failed to move: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
+            logging.error(
+                f"failed to move: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
 
             continue
 
-        logging.info(f"moved: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
+        logging.info(
+            f"moved: '{new_pan_card_img_file_name}' from '{PAN_CARD_NEW_IMGS_DIR}' to '{PAN_CARD_ARCHIVED_IMGS_DIR}'")
 
 
 if __name__ == "__main__":
