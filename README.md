@@ -107,7 +107,7 @@ To get a local copy up and running follow these simple example steps.
 
 #### Running locally
 
-1. Clone this repository - [https://github.com/tirthyakamaldasgupta/pan-card-utility](https://github.com/tirthyakamaldasgupta/pan-card-utility).
+1. Clone the repository- [https://github.com/tirthyakamaldasgupta/pan-card-utility](https://github.com/tirthyakamaldasgupta/pan-card-utility).
 
 2. Create the following directories at the root of the project directory:
    - **pan-card-new-images**
@@ -135,6 +135,31 @@ To get a local copy up and running follow these simple example steps.
      ```shell
      python3 main.py
      ```
+
+#### Running in the form of a Docker container
+
+1. Pull the image from DockerHub:
+   ```shell
+   docker pull tirthyakamaldasgupta/pan-card-utility
+   ```
+
+2. Create a **.env** file anywhere and populate it with the specified parameters (refer to [here](here) for the parameters).
+
+3. Create the following directories anywhere:
+   - **pan-card-new-images**
+   - **pan-card-archived-images**
+
+4. Put the PAN card images or download a sample image from [here](https://github.com/tirthyakamaldasgupta/pan-card-utility/blame/99c34cf237d4765c5d30ca60857f21086f99f08e/images/sample-pan-card-image-one.webp) and place it inside the **pan-card-new-images** folder.
+
+5. Create a container and run it each time you want to execute the application:
+   ```shell
+   docker run --env-file <**.env** file path> -it -v <**pan-card-new-images** directory path>:/usr/src/app/pan-card-new-images -v <**pan-card-archived-images** directory path>:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility pan-card-utility
+   ```
+
+   **Example:**
+   ```shell
+   docker run --env-file .env -it -v /Users/tirthyakamaldasgupta/Downloads/Projects/Production/POCs/pan-card-utility/pan-card-new-images:/usr/src/app/pan-card-new-images -v /Users/tirthyakamaldasgupta/Downloads/Projects/Production/POCs/pan-card-utility/pan-card-archived-images:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility pan-card-utility
+   ```
 
 ## Usage
 
