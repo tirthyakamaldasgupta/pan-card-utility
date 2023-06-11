@@ -57,8 +57,7 @@ This well-organized combination of Python, PlanetScale, and Docker forms the bac
 
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Get the application up and running on your system.
 
 ### Prerequisites
 
@@ -196,6 +195,38 @@ To get a local copy up and running follow these simple example steps.
        docker run --env-file .env -it -v /path/to/pan-card-new-images:/usr/src/app/pan-card-new-images -v /path/to/pan-card-archived-images:/usr/src/app/pan-card-archived-images --rm --name my-pan-card-utility my-pan-card-utility-container
        ```
 
+#### Walkthrough
+
+In this walkthrough example, I will demonstrate the steps involved in using the pre-built Docker image of the application.
+
+1. Creating the required directories: Inside the **Downloads** folder, I have already set up the **pan-card-new-images** directory with a sample PAN card image, and the **pan-card-archived-images** directory is empty.
+
+   ![Creating the required directories](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/1.%20Folders%20created.png)
+
+2. Setting up the environment variables: I have stored the required environment variables in a **.env** file located in my home directory.
+
+   ![Setting up the environment variables](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/2.%20Environment%20variables.png)
+
+3. Database table state: The **pan_card_details** table in the PlanetScale hosted database currently does not contain any rows.
+
+   ![Empty database table](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/3.%20Current%20empty%20state%20of%20PlanetScale%20database%20table.png)
+
+4. Docker image creation: I have already created the required Docker image on my system.
+
+   ![Docker image created](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/5.%20Docker%20image.png)
+
+5. Running the container: I will run the container from my Terminal. The container logs will display the extraction of data and the archiving of the image. Validation will be performed in the next steps.
+
+    ![Running the container](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/5.%20Docker%20container%20running.png)
+
+6. Data insertion: The data extracted from the PAN card image has been successfully inserted into the database table.
+
+   ![Data inserted into the table](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/7.%20Data%20inserted.png)
+
+7. Image archiving: The PAN card image has been moved from the **pan-card-new-images** directory to the **pan-card-archived-images** directory.
+
+   ![Image archived](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/6.%20Image%20archived.png)
+
 #### Environment file variables
 
 | Name                                               | Value                                                                           |
@@ -213,6 +244,8 @@ To get a local copy up and running follow these simple example steps.
 ##### Environment variables reference
 
 Refer to the [Prerequisites](#prerequisites) section for instructions on how to obtain the values for the environment variables.
+
+
 
 ## Roadmap
 
