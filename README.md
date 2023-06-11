@@ -213,7 +213,7 @@ In this walkthrough example, I will demonstrate the steps involved in using the 
 
 4. Docker image creation: I have already created the required Docker image on my system.
 
-   ![Docker image created](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/5.%20Docker%20image.png)
+   ![Docker image created](https://raw.githubusercontent.com/tirthyakamaldasgupta/pan-card-utility/main/examples/walkthrough/images/4.%20Docker%20image.png)
 
 5. Running the container: I will run the container from my Terminal. The container logs will display the extraction of data and the archiving of the image. Validation will be performed in the next steps.
 
