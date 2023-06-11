@@ -43,7 +43,7 @@ This project showcases a Python-based application that streamlines the process o
 
 The application harnesses the immense capabilities of IDfy's PAN OCR API, a cutting-edge solution that leverages advanced optical character recognition technology specifically tailored for PAN Cards. By integrating this API into the workflow, the application retrieves comprehensive and accurate metadata from the PAN Card images, extracting key details such as name, date of birth, PAN number, and more.
 
-With the extracted metadata in hand, the application proceeds to store this valuable information in a secure and efficient database. This enables streamlined access, retrieval, and management of PAN Card data, promoting enhanced organizational efficiency and minimizing manual data entry errors. Additionally, it archives the processed images into a separate designated folder.
+With the extracted metadata in hand, the application proceeds to store this valuable information in a secure and efficient MySQL database, completely managed by PlanetScale. This enables streamlined access, retrieval, and management of PAN Card data, promoting enhanced organizational efficiency and minimizing manual data entry errors. Additionally, it archives the processed images into a separate designated folder.
 
 ## Built With
 
