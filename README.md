@@ -39,6 +39,8 @@
 
 ## About The Project
 
+![2. PAN Card OCR: Simplifying Data Extraction with the Pan Card Utility Application walkthrough](https://youtu.be/u0L3-7YoL_s)
+
 This project showcases a Python-based application that streamlines the process of handling PAN Card images and their associated metadata. When the application is executed, it diligently monitors a designated directory, actively searching for any new PAN Card images that may have been added. Upon detecting image(s), it seamlessly converts them to base64 representation, optimizing its compatibility for subsequent processing.
 
 The application harnesses the immense capabilities of IDfy's PAN OCR API, a cutting-edge solution that leverages advanced optical character recognition technology specifically tailored for PAN Cards. By integrating this API into the workflow, the application retrieves comprehensive and accurate metadata from the PAN Card images, extracting key details such as name, date of birth, PAN number, and more.
