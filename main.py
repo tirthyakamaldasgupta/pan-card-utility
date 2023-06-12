@@ -288,13 +288,13 @@ def main():
 
             continue
 
-        api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30',
-                         'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e',
-                         'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {
-                'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '',
-                                      'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False,
-                                      'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}},
-                         'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
+        # api_resp_json = {'action': 'extract', 'completed_at': '2023-06-08T15:30:58+05:30',
+        #                  'created_at': '2023-06-08T15:30:57+05:30', 'group_id': '8e16424a-58fc-4ba4-ab20-5bc8e7c3c41e',
+        #                  'request_id': '9b8e4660-535b-4463-8361-0b451d31cb10', 'result': {
+        #         'extraction_output': {'age': 36, 'date_of_birth': '1986-07-16', 'date_of_issue': '',
+        #                               'fathers_name': 'DURAISAMY', 'id_number': 'BNZPM2501F', 'is_scanned': False,
+        #                               'minor': False, 'name_on_card': 'D MANIKANDAN', 'pan_type': 'Individual'}},
+        #                  'status': 'completed', 'task_id': '74f4c926-250c-43ca-9c53-453e87ceacd1', 'type': 'ind_pan'}
 
         logging.info(api_resp_json)
 
