@@ -113,11 +113,11 @@ Get the application up and running on your system.
    pip install -r requirements.txt
    ```
 
-#### Pulling pre-built image from DockerHub
+#### Pulling pre-built image from GitHub Container Registry
 
-1. Pull the image from DockerHub:
+1. Pull the image from GitHub Container Registry:
    ```shell
-   docker pull tirthyakamaldasgupta/pan-card-utility
+   docker pull ghcr.io/tirthyakamaldasgupta/pan-card-utility:latest
    ```
 
 #### Build Docker image from source:
