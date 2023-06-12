@@ -1,8 +1,8 @@
-FROM python:3.9
+FROM python:3.9-alpine
 
 WORKDIR /usr/src/app
 
-RUN apt-get install libmariadb-dev -y
+RUN apk add --no-cache mariadb-connector-c-dev
 
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
