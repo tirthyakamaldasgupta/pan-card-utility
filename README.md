@@ -157,6 +157,7 @@ Get the application up and running on your system.
      ```shell
      python3 main.py
      ```
+
 #### Running in the form of a container from pre-built Docker image
 
 1. Create a **.env** file anywhere and populate it with the specified parameters (refer to [here](#environment-file-variables) for the parameters).
@@ -169,13 +170,47 @@ Get the application up and running on your system.
 
 4. Create a container and run it each time you want to execute the application by issuing the following command:
    ```shell
-   docker run --env-file <**.env** file path> -it -v <**pan-card-new-images** directory path>:/usr/src/app/pan-card-new-images -v <**pan-card-archived-images** directory path>:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility <your preferred container name>
+   docker run --env-file <.env file path> -it -v <pan-card-new-images directory path>:/usr/src/app/pan-card-new-images -v <pan-card-archived-images directory path>:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility <your preferred container name>
    ```
 
    **Example**
    ```shell
    docker run --env-file .env -it -v /Users/tirthyakamaldasgupta/Downloads/Projects/Production/POCs/pan-card-utility/pan-card-new-images:/usr/src/app/pan-card-new-images -v /Users/tirthyakamaldasgupta/Downloads/Projects/Production/POCs/pan-card-utility/pan-card-archived-images:/usr/src/app/pan-card-archived-images --rm --name pan-card-utility pan-card-utility
    ```
+
+   **Notes:**
+
+   **For host directory paths used for Docker volume mapping containing spaces**
+
+   If your host path contains spaces and you want to map a Docker volume, it is recommended to enclose the entire volume mapping within double quotes.
+
+   **Examples:**
+
+   1. Both the paths for the **pan-card-new-images** and the **pan-card-archived-images** directories contain spaces:
+      ```shell
+      docker run --env-file .env -it -v "/Users/tirthyakamaldasgupta/Library/Mobile Documents/com~apple~CloudDocs/PAN Card Test/pan-card-new-images:/usr/src/app/pan-card-new-images" -v "/Users/tirthyakamaldasgupta/Library/Mobile Documents/com~apple~CloudDocs/PAN Card Test/pan-card-archived-images:/usr/src/app/pan-card-archived-images" --rm --name pan-card-utility pan-card-utility
+      ```
+
+   2. Only the path for the **pan-card-new-images** directory contains spaces:
+      ```shell
+      docker run --env-file .env -it -v "/Users/tirthyakamaldasgupta/Library/Mobile Documents/com~apple~CloudDocs/PAN Card Test/pan-card-new-images:/usr/src/app/pan-card-new-images" -v /Users/tirthyakamaldasgupta/Library/pan-card-archived-images --rm --name pan-card-utility pan-card-utility
+      ```
+
+   3. Only the path for the **pan-card-archived-images** directory contains spaces:
+      ```shell
+      docker run --env-file .env -it -v /Users/tirthyakamaldasgupta/Library/pan-card-new-images:/usr/src/app/pan-card-new-images -v "/Users/tirthyakamaldasgupta/Library/Mobile Documents/com~apple~CloudDocs/PAN Card Test/pan-card-archived-images:/usr/src/app/pan-card-archived-images" --rm --name pan-card-utility pan-card-utility
+      ```
+
+   **For .env file path containing spaces**
+
+   If the path for your **.env** file contains spaces, it is recommended to enclose the entire path within double quotes.
+
+   **Example:**
+
+   1. The path for the **.env** file contains spaces:
+      ```shell
+      docker run --env-file "/Users/tirthyakamaldasgupta/Downloads/dgb fvfd/.env" -it -v "/Users/tirthyakamaldasgupta/Library/Mobile Documents/com~apple~CloudDocs/PAN Card Test/pan-card-new-images:/usr/src/app/pan-card-new-images" -v "/Users/tirthyakamaldasgupta/Library/Mobile Documents/com~apple~CloudDocs/PAN Card Test/pan-card-archived-images:/usr/src/app/pan-card-archived-images" --rm --name pan-card-utility pan-card-utility
+      ```
 
 #### Running in the form of a container from source-built Docker image
 
@@ -185,7 +220,7 @@ Get the application up and running on your system.
    1. Skip step 1 of the section since you are building the image from scratch.
    2. Modify the command mentioned in step 5 before executing it, as follows:
        ```shell
-       docker run --env-file <**.env** file path> -it -v <**pan-card-new-images** directory path>:/usr/src/app/pan-card-new-images -v <**pan-card-archived-images** directory path>:/usr/src/app/pan-card-archived-images --rm --name <your image name> <your preferred container name>
+       docker run --env-file <.env file path> -it -v <pan-card-new-images directory path>:/usr/src/app/pan-card-new-images -v <pan-card-archived-images directory path>:/usr/src/app/pan-card-archived-images --rm --name <your image name> <your preferred container name>
        ```
 
        **Example:**
